@@ -1,53 +1,67 @@
 // 1.Створіть "закладки" — список посилань на важливі сторінки. Додавайте, видаляйте та редагуйте посилання в списку, зберігайте його в localStorage, щоб він залишався між сесіями. 
 
-const bookmarkInput = document.getElementById("bookmarkInput");
-const addBookmarkBtn = document.getElementById("addBookmarkBtn");
-const bookmarkList = document.getElementById("bookmarkList");
+const inputEl = document.getElementById("bookmarkInput");
+const btnEl = document.getElementById("addBookmarkBtn");
+const listEl = document.getElementById("bookmarkList");
 
-let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) ;
 
-function show() {
-  bookmarkList.innerHTML = "";
+const  STORAGE_KEY = "inputValue"
 
-  for (let i = 0; i < bookmarks.length; i++) {
-    let li = document.createElement("li");
+const bookArray = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    let a = document.createElement("a");
-    a.href = bookmarks[i];
-    a.textContent = bookmarks[i];
+createBookItems(bookArray);
 
-    let btn = document.createElement("button");
-    btn.textContent = "X";
-    btn.classList.add("delete");
+btnEl.addEventListener("click", () => {
+    const value = inputEl.value;
+    bookArray.push(value);
 
-    btn.addEventListener("click", () => {
-      bookmarks.splice(i, 1);
-      localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-      show();
-    });
+    savedData();
 
-    li.appendChild(a);
-    li.appendChild(btn);
-    bookmarkList.appendChild(li);
-  }
-}
+    inputEl.value = "";
+    createBookItems(bookArray);
 
-addBookmarkBtn.addEventListener("click", () => {
-  let value = bookmarkInput.value.trim();
-
-  if (value === "") {
-    alert("Поле не може бути пустим!");
-    return;
-  }
-
-  bookmarks.push(value);
-  localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-
-  bookmarkInput.value = "";
-  show();
 });
 
-show();
+
+function createBookItems(arr) {
+    const item = arr.map((elem, index) => {
+        return `<li id="${index}">
+                    <a href="#">${elem}</a>
+                    <div>
+                        <button>Видалити</button>
+                    </div>
+                </li>`
+
+    }).join("")
+    listEl.innerHTML = item
+};
+
+
+listEl.addEventListener("click", (event) => {
+
+    if(event.target.nodeName !== "BUTTON") {
+        return
+    }
+
+    // const li = event.target.parentNode;
+    const li = event.target.closest("li")
+    
+    console.log(li);
+    
+    const id =li.id
+    console.log(id);
+    bookArray.splice(id, 1);
+
+    savedData();
+
+    createBookItems(bookArray)
+
+});
+
+
+function savedData() {
+   localStorage.setItem("STORAGE_KEY", JSON.stringify(bookArray)); 
+};
 
 
 // 2.Форма збереження даних
